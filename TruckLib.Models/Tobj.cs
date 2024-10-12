@@ -70,6 +70,17 @@ namespace TruckLib.Models
             return tobj;
         }
 
+        public static Tobj Load(byte[] tobjBytes)
+        {
+            var tobj = new Tobj();
+
+            using var ms = new MemoryStream(tobjBytes);
+            using var r = new BinaryReader(ms);
+            tobj.Deserialize(r);
+
+            return tobj;
+        }
+
         public void Save(string tobjPath)
         {
             using var fs = new FileStream(tobjPath, FileMode.Create);
