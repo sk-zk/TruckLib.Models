@@ -90,7 +90,7 @@ namespace TruckLib.Models
 
         public void Deserialize(BinaryReader r, uint? version = null)
         {
-            if (version != SupportedVersion)
+            if (version is not null && version != SupportedVersion)
                 throw new UnsupportedVersionException($"Version {version} is not supported.");
 
             version = r.ReadUInt32();
@@ -141,9 +141,11 @@ namespace TruckLib.Models
             w.Write(unknown5);
             w.Write((byte)Type);
             w.Write(unknown6);
-            w.Write((byte)MagFilter);
-            w.Write((byte)MinFilter);
-            w.Write((byte)MipFilter);
+            // Write default value if filters are set to what the default is.
+            // This matches the behavior of the official extractor.
+            w.Write(MagFilter == TobjFilter.Linear ? (byte)TobjFilter.Default : (byte)MagFilter);
+            w.Write(MinFilter == TobjFilter.Linear ? (byte)TobjFilter.Default : (byte)MinFilter);
+            w.Write(MipFilter == TobjMipFilter.Trilinear ? (byte)TobjMipFilter.Default : (byte)MipFilter);
             w.Write(unknown7);
             w.Write((byte)AddrU);
             w.Write((byte)AddrV);
