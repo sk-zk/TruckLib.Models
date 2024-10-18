@@ -14,8 +14,8 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\TruckLib.Core\TruckLib.Core\TruckLib.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="TruckLib.Core" Version="0.1.0" />
+	</ItemGroup>
 
 </Project>
