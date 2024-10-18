@@ -17,5 +17,16 @@
 	<ItemGroup>
 	  <PackageReference Include="TruckLib.Core" Version="0.1.0" />
 	</ItemGroup>
+  
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
