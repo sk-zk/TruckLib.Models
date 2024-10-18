@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TruckLib.Models.Ppd;
 
-namespace TruckLibTests.TruckLib.Models.Ppd
+namespace TruckLib.Models.Tests.Ppd
 {
     public class PrefabDescriptorTest
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TruckLib.Models;
 
-namespace TruckLibTests.TruckLib
+namespace TruckLib.Models.Tests
 {
     public class StringUtilsTest
     {     
