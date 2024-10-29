@@ -18,8 +18,6 @@ namespace TruckLib.Models
         private readonly char[] PmgSignature = ['g', 'm', 'P'];
         private const string PmgExtension = "pmg";
 
-        public string Name { get; set; } = "untitled";
-
         public List<Look> Looks { get; set; } = [];
 
         public List<Variant> Variants { get; set; } = [];
@@ -42,15 +40,10 @@ namespace TruckLib.Models
             Variants.Add(new Variant("default"));
         }
 
-        public Model(string name) : this()
-        {
-            Name = name;
-        }
-
         public static Model Open(string pmdPath)
         {
             var name = Path.GetFileNameWithoutExtension(pmdPath);
-            var model = new Model(name);
+            var model = new Model();
 
             using (var r = new BinaryReader(new FileStream(pmdPath, FileMode.Open)))
             {
@@ -66,9 +59,9 @@ namespace TruckLib.Models
             return model;
         }
 
-        public void Save(string directory)
+        public void Save(string directory, string name)
         {
-            var pmdPath = Path.Combine(directory, Name + "." + PmdExtension);
+            var pmdPath = Path.Combine(directory, $"{name}.{PmdExtension}");
             using (var w = new BinaryWriter(new FileStream(pmdPath, FileMode.Create)))
             {
                 WritePmd(w);
