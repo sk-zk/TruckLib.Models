@@ -40,7 +40,7 @@ namespace TruckLib.Models.Ppd
         public List<uint[]> Unknown { get; set; } = [];
 
         /// <summary>
-        /// Reads a .ppd file from disk.
+        /// Reads a ppd file from disk.
         /// </summary>
         /// <param name="path">The path to the file.</param>
         /// <returns>The prefab descriptor.</returns>
@@ -53,7 +53,21 @@ namespace TruckLib.Models.Ppd
         }
 
         /// <summary>
-        /// Reads a .ppd file from memory.
+        /// Reads a ppd file from disk.
+        /// </summary>
+        /// <param name="path">The path to the file.</param>
+        /// <param name="fs">The file system to load the file from.</param>
+        /// <returns>The prefab descriptor.</returns>
+        /// <exception cref="NotSupportedException">Thrown if the descriptor version
+        /// is not supported.</exception>
+        public static PrefabDescriptor Open(string path, IFileSystem fs)
+        {
+            using var ppdStream = fs.Open(path);
+            return Load(ppdStream);
+        }
+
+        /// <summary>
+        /// Reads a ppd file from memory.
         /// </summary>
         /// <param name="ppdBuffer">The buffer containing the file.</param>
         /// <returns>The prefab descriptor.</returns>
@@ -66,7 +80,7 @@ namespace TruckLib.Models.Ppd
         }
 
         /// <summary>
-        /// Reads a .ppd file from memory.
+        /// Reads a ppd file from memory.
         /// </summary>
         /// <param name="ppdStream">The stream containing the file.</param>
         /// <returns>The prefab descriptor.</returns>

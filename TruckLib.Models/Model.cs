@@ -57,6 +57,22 @@ namespace TruckLib.Models
         }
 
         /// <summary>
+        /// Reads a model.
+        /// </summary>
+        /// <param name="pmdPath">The path to the pmd file of the model.</param>
+        /// <param name="fs">The file system to load the model files from.</param>
+        /// <returns>A Model object.</returns>
+        public static Model Open(string pmdPath, IFileSystem fs)
+        {
+           using var pmdStream = fs.Open(pmdPath);
+
+           var pmgPath = Path.ChangeExtension(pmdPath, PmgExtension);
+           using var pmgStream = fs.Open(pmgPath);
+
+           return Load(pmdStream, pmgStream);
+        }
+
+        /// <summary>
         /// Loads a model from memory.
         /// </summary>
         /// <param name="pmdBuffer">The buffer containing the pmd file.</param>
@@ -78,12 +94,14 @@ namespace TruckLib.Models
         public static Model Load(Stream pmdStream, Stream pmgStream)
         {
             var model = new Model();
-            using (var r = new BinaryReader(pmdStream))
+            if (pmdStream.Length > 0)
             {
+                using var r = new BinaryReader(pmdStream);
                 model.ReadPmd(r);
             }
-            using (var r = new BinaryReader(pmgStream))
+            if (pmgStream.Length > 0)
             {
+                using var r = new BinaryReader(pmgStream);
                 model.ReadPmg(r);
             }
             return model;
