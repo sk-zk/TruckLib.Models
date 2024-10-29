@@ -48,28 +48,35 @@ namespace TruckLib.Models.Ppd
         /// is not supported.</exception>
         public static PrefabDescriptor Open(string path)
         {
-            var ppd = new PrefabDescriptor();
-            using (var r = new BinaryReader(new FileStream(path, FileMode.Open)))
-            {
-                ppd.Deserialize(r);
-            }
-            return ppd;
+            using var ppdStream = new FileStream(path, FileMode.Open);
+            return Load(ppdStream);
         }
 
         /// <summary>
         /// Reads a .ppd file from memory.
         /// </summary>
-        /// <param name="file">The file as byte array.</param>
+        /// <param name="ppdBuffer">The buffer containing the file.</param>
         /// <returns>The prefab descriptor.</returns>
         /// <exception cref="NotSupportedException">Thrown if the descriptor version
         /// is not supported.</exception>
-        public static PrefabDescriptor Load(byte[] file)
+        public static PrefabDescriptor Load(byte[] ppdBuffer)
+        {
+            using var ms = new MemoryStream(ppdBuffer);
+            return Load(ms);
+        }
+
+        /// <summary>
+        /// Reads a .ppd file from memory.
+        /// </summary>
+        /// <param name="ppdStream">The stream containing the file.</param>
+        /// <returns>The prefab descriptor.</returns>
+        /// <exception cref="NotSupportedException">Thrown if the descriptor version
+        /// is not supported.</exception>
+        public static PrefabDescriptor Load(Stream ppdStream)
         {
             var ppd = new PrefabDescriptor();
-            using (var r = new BinaryReader(new MemoryStream(file)))
-            {
-                ppd.Deserialize(r);
-            }
+            using var r = new BinaryReader(ppdStream);
+            ppd.Deserialize(r);
             return ppd;
         }
 

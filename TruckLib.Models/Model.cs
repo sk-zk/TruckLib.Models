@@ -7,8 +7,9 @@ using System.Text;
 
 namespace TruckLib.Models
 {
-    // hi r/badcode
-
+    /// <summary>
+    /// Represents the metadata and geometry of a model.
+    /// </summary>
     public class Model
     {
         private const int PmdVersion = 4;
@@ -40,22 +41,51 @@ namespace TruckLib.Models
             Variants.Add(new Variant("default"));
         }
 
+        /// <summary>
+        /// Reads a model from disk.
+        /// </summary>
+        /// <param name="pmdPath">The path to the pmd file of the model.</param>
+        /// <returns>A Model object.</returns>
         public static Model Open(string pmdPath)
         {
-            var name = Path.GetFileNameWithoutExtension(pmdPath);
-            var model = new Model();
+            using var pmdStream = new FileStream(pmdPath, FileMode.Open);
 
-            using (var r = new BinaryReader(new FileStream(pmdPath, FileMode.Open)))
+            var pmgPath = Path.ChangeExtension(pmdPath, PmgExtension);
+            using var pmgStream = new FileStream(pmgPath, FileMode.Open);
+
+            return Load(pmdStream, pmgStream);
+        }
+
+        /// <summary>
+        /// Loads a model from memory.
+        /// </summary>
+        /// <param name="pmdBuffer">The buffer containing the pmd file.</param>
+        /// <param name="pmgBuffer">The buffer containing the pmg file.</param>
+        /// <returns>A Model object.</returns>
+        public static Model Load(byte[] pmdBuffer, byte[] pmgBuffer)
+        {
+            using var pmdStream = new MemoryStream(pmdBuffer);
+            using var pmgStream = new MemoryStream(pmgBuffer);
+            return Load(pmdStream, pmgStream);
+        }
+
+        /// <summary>
+        /// Loads a model from memory.
+        /// </summary>
+        /// <param name="pmdBuffer">The stream containing the pmd file.</param>
+        /// <param name="pmgBuffer">The stream containing the pmg file.</param>
+        /// <returns>A Model object.</returns>
+        public static Model Load(Stream pmdStream, Stream pmgStream)
+        {
+            var model = new Model();
+            using (var r = new BinaryReader(pmdStream))
             {
                 model.ReadPmd(r);
             }
-
-            var pmgPath = Path.ChangeExtension(pmdPath, PmgExtension);
-            using (var r = new BinaryReader(new FileStream(pmgPath, FileMode.Open)))
+            using (var r = new BinaryReader(pmgStream))
             {
                 model.ReadPmg(r);
             }
-
             return model;
         }
 
@@ -169,7 +199,7 @@ namespace TruckLib.Models
             // look material paths
             var materialsData = r.ReadBytes((int)materialBlockSize);
             var materials = StringUtils.CStringBytesToList(materialsData);
-            for(int i = 0; i < Looks.Count; i++)
+            for (int i = 0; i < Looks.Count; i++)
             {
                 Looks[i].Materials.AddRange(
                     materials.GetRange(i * (int)materialCount, (int)materialCount)
