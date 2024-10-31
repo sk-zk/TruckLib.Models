@@ -12,7 +12,7 @@ namespace TruckLib.Models
     /// </summary>
     public class Model
     {
-        private const int PmdVersion = 4;
+        private const int SupportedVersion = 4;
         private const string PmdExtension = "pmd";
 
         private const byte PmgVersion = 0x15;
@@ -134,7 +134,7 @@ namespace TruckLib.Models
             r.BaseStream.Position = 0;
 
             var version = r.ReadUInt32();
-            if (version != PmdVersion)
+            if (version != SupportedVersion)
             {
                 throw new UnsupportedVersionException($".pmd version {version} is not supported.");
             }
@@ -300,7 +300,7 @@ namespace TruckLib.Models
 
         private void WritePmd(BinaryWriter w)
         {
-            w.Write(PmdVersion);
+            w.Write(SupportedVersion);
 
             w.Write(Looks[0].Materials.Count);
             w.Write(Looks.Count);
