@@ -12,10 +12,10 @@ namespace TruckLib.Models
     /// </summary>
     public class Model
     {
-        private const int SupportedVersion = 4;
+        private const int SupportedPmdVersion = 4;
         private const string PmdExtension = "pmd";
 
-        private const byte PmgVersion = 0x15;
+        private const byte SupportedPmgVersion = 0x15;
         private readonly char[] PmgSignature = ['g', 'm', 'P'];
         private const string PmgExtension = "pmg";
 
@@ -134,7 +134,7 @@ namespace TruckLib.Models
             r.BaseStream.Position = 0;
 
             var version = r.ReadUInt32();
-            if (version != SupportedVersion)
+            if (version != SupportedPmdVersion)
             {
                 throw new UnsupportedVersionException($".pmd version {version} is not supported.");
             }
@@ -229,7 +229,7 @@ namespace TruckLib.Models
         private void ReadPmg(BinaryReader r)
         {
             var version = r.ReadByte();
-            if (version != PmgVersion)
+            if (version != SupportedPmgVersion)
             {
                 throw new UnsupportedVersionException($".pmg version {version} is not supported.");
             }
@@ -301,7 +301,7 @@ namespace TruckLib.Models
 
         private void WritePmd(BinaryWriter w)
         {
-            w.Write(SupportedVersion);
+            w.Write(SupportedPmdVersion);
 
             w.Write(Looks[0].Materials.Count);
             w.Write(Looks.Count);
@@ -411,7 +411,7 @@ namespace TruckLib.Models
 
         private void WritePmg(BinaryWriter w)
         {
-            w.Write(PmgVersion);
+            w.Write(SupportedPmgVersion);
 
             w.Write(Encoding.ASCII.GetBytes(PmgSignature).Reverse().ToArray());
 
