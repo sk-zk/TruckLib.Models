@@ -154,8 +154,8 @@ namespace TruckLib.Models
             var partAttribsOffset = r.ReadUInt32();
             var attribsValuesOffset = r.ReadUInt32();
             var attribsHeaderOffset = r.ReadUInt32();
-            var materialOffsetsOffset = r.ReadUInt32();
-            var materialDataOffset = r.ReadUInt32();
+            var materialPathsOffsetsOffset = r.ReadUInt32();
+            var materialPathsOffset = r.ReadUInt32();
 
             // look names
             Looks.Clear();
@@ -207,16 +207,17 @@ namespace TruckLib.Models
                 }
             }
 
-            // material offsets; I think we can get away with ignoring this?
-            var materialsOffset = new List<uint>();
+            // I think we can get away with ignoring this?
+            var materialPathOffsets = new List<uint>();
             for (int i = 0; i < lookCount * materialCount; i++)
             {
-                materialsOffset.Add(r.ReadUInt32());
+                materialPathOffsets.Add(r.ReadUInt32());
             }
 
-            // look material paths
-            var materialsData = r.ReadBytes((int)materialBlockSize);
-            var materials = StringUtils.CStringBytesToList(materialsData);
+            // Look material paths. materialBlockSize is ignored because I've
+            // encountered files where this value is wrong.
+            var materialPaths = r.ReadBytes((int)(r.BaseStream.Length - materialPathsOffset));
+            var materials = StringUtils.CStringBytesToList(materialPaths);
             for (int i = 0; i < Looks.Count; i++)
             {
                 Looks[i].Materials.AddRange(
