@@ -12,18 +12,7 @@ namespace TruckLib.Models.Ppd
     /// Represents a control node.
     /// </summary>
     public class ControlNode : IBinarySerializable
-    { 
-        // is this a ref. we can resolve instead of
-        // having an index?
-        public uint TerrainPointIndex { get; set; }
-
-        // and can we replace this with a property then?
-        public uint TerrainPointCount { get; set; }
-
-        public uint VariantIdx { get; set; }
-
-        public uint VariantCount { get; set; }
-
+    {     
         public Vector3 Position { get; set; }
 
         public Vector3 Direction { get; set; }
@@ -32,13 +21,27 @@ namespace TruckLib.Models.Ppd
 
         public int[] OutputLines { get; set; } = new int[8];
 
+        /// <summary>
+        /// The terrain points for this node, which are used to extrude
+        /// terrain from the edge of this node.
+        /// The key of the dictionary is the index of the model variant.
+        /// </summary>
+        public Dictionary<int, List<TerrainPoint>> TerrainPoints { get; set; } = [];
+
+        internal uint TerrainPointIndex { get; set; }
+
+        internal uint TerrainPointCount { get; set; }
+
+        internal uint TerrainPointVariantIdx { get; set; }
+
+        internal uint TerrainPointVariantCount { get; set; }
+
         public void Deserialize(BinaryReader r, uint? version = null)
         {
             TerrainPointIndex = r.ReadUInt32();
             TerrainPointCount = r.ReadUInt32();
-
-            VariantIdx = r.ReadUInt32();
-            VariantCount = r.ReadUInt32();
+            TerrainPointVariantIdx = r.ReadUInt32();
+            TerrainPointVariantCount = r.ReadUInt32();
 
             Position = r.ReadVector3();
             Direction = r.ReadVector3();

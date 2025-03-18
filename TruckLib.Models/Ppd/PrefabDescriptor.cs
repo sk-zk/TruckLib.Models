@@ -25,12 +25,6 @@ namespace TruckLib.Models.Ppd
 
         public List<SpawnPoint> SpawnPoints { get; set; } = [];
 
-        public List<Vector3> TerrainPointPositions { get; set; } = [];
-
-        public List<Vector3> TerrainPointNormals { get; set; } = [];
-
-        public List<TerrainPointVariant> TerrainPointVariants { get; set; } = [];
-
         public List<MapPoint> MapPoints { get; set; } = [];
 
         public List<TriggerPoint> TriggerPoints { get; set; } = [];
@@ -142,12 +136,14 @@ namespace TruckLib.Models.Ppd
             Signs = r.ReadObjectList<Sign>(signCount);
             Semaphores = r.ReadObjectList<Semaphore>(semaphoreCount);
             SpawnPoints = r.ReadObjectList<SpawnPoint>(spawnPointCount, version);
-            TerrainPointPositions = r.ReadObjectList<Vector3>(terrainPointCount);
-            TerrainPointNormals = r.ReadObjectList<Vector3>(terrainPointCount);
-            TerrainPointVariants = r.ReadObjectList<TerrainPointVariant>(terrainPointVariantCount);
+            var terrainPointPositions = r.ReadObjectList<Vector3>(terrainPointCount);
+            var terrainPointNormals = r.ReadObjectList<Vector3>(terrainPointCount);
+            var terrainPointVariants = r.ReadObjectList<TerrainPointVariant>(terrainPointVariantCount);
             MapPoints = r.ReadObjectList<MapPoint>(mapPointCount);
             TriggerPoints = r.ReadObjectList<TriggerPoint>(triggerPointCount);
             Intersections = r.ReadObjectList<Intersection>(intersectionCount);
+
+            SetTerrainPoints(terrainPointPositions, terrainPointNormals, terrainPointVariants);
         }
 
         private void Deserialize16(BinaryReader r)
@@ -174,10 +170,9 @@ namespace TruckLib.Models.Ppd
             Signs = r.ReadObjectList<Sign>(signCount);
             Semaphores = r.ReadObjectList<Semaphore>(semaphoreCount);
             SpawnPoints = r.ReadObjectList<SpawnPoint>(spawnPointCount, version);
-            TerrainPointPositions = r.ReadObjectList<Vector3>(terrainPointCount);
-            TerrainPointNormals = r.ReadObjectList<Vector3>(terrainPointCount);
-            TerrainPointVariants = r.ReadObjectList<TerrainPointVariant>(terrainPointVariantCount);
-            MapPoints = r.ReadObjectList<MapPoint>(mapPointCount);
+            var terrainPointPositions = r.ReadObjectList<Vector3>(terrainPointCount);
+            var terrainPointNormals = r.ReadObjectList<Vector3>(terrainPointCount);
+            var terrainPointVariants = r.ReadObjectList<TerrainPointVariant>(terrainPointVariantCount);
             TriggerPoints = r.ReadObjectList<TriggerPoint>(triggerPointCount);
             Intersections = r.ReadObjectList<Intersection>(intersectionCount);
 
@@ -191,6 +186,8 @@ namespace TruckLib.Models.Ppd
                 }
                 Unknown.Add(newdata);
             }
+
+            SetTerrainPoints(terrainPointPositions, terrainPointNormals, terrainPointVariants);
         }
 
         private void Deserialize17(BinaryReader r)
@@ -217,9 +214,9 @@ namespace TruckLib.Models.Ppd
             Signs = r.ReadObjectList<Sign>(signCount);
             Semaphores = r.ReadObjectList<Semaphore>(semaphoreCount);
             SpawnPoints = r.ReadObjectList<SpawnPoint>(spawnPointCount, version);
-            TerrainPointPositions = r.ReadObjectList<Vector3>(terrainPointCount);
-            TerrainPointNormals = r.ReadObjectList<Vector3>(terrainPointCount);
-            TerrainPointVariants = r.ReadObjectList<TerrainPointVariant>(terrainPointVariantCount);
+            var terrainPointPositions = r.ReadObjectList<Vector3>(terrainPointCount);
+            var terrainPointNormals = r.ReadObjectList<Vector3>(terrainPointCount);
+            var terrainPointVariants = r.ReadObjectList<TerrainPointVariant>(terrainPointVariantCount);
             MapPoints = r.ReadObjectList<MapPoint>(mapPointCount);
             TriggerPoints = r.ReadObjectList<TriggerPoint>(triggerPointCount);
             Intersections = r.ReadObjectList<Intersection>(intersectionCount);
@@ -234,6 +231,8 @@ namespace TruckLib.Models.Ppd
                 }
                 Unknown.Add(newdata);
             }
+
+            SetTerrainPoints(terrainPointPositions, terrainPointNormals, terrainPointVariants);
         }
 
         private void Deserialize18(BinaryReader r)
@@ -260,9 +259,9 @@ namespace TruckLib.Models.Ppd
             Signs = r.ReadObjectList<Sign>(signCount);
             Semaphores = r.ReadObjectList<Semaphore>(semaphoreCount);
             SpawnPoints = r.ReadObjectList<SpawnPoint>(spawnPointCount, version);
-            TerrainPointPositions = r.ReadObjectList<Vector3>(terrainPointCount);
-            TerrainPointNormals = r.ReadObjectList<Vector3>(terrainPointCount);
-            TerrainPointVariants = r.ReadObjectList<TerrainPointVariant>(terrainPointVariantCount);
+            var terrainPointPositions = r.ReadObjectList<Vector3>(terrainPointCount);
+            var terrainPointNormals = r.ReadObjectList<Vector3>(terrainPointCount);
+            var terrainPointVariants = r.ReadObjectList<TerrainPointVariant>(terrainPointVariantCount);
             MapPoints = r.ReadObjectList<MapPoint>(mapPointCount);
             TriggerPoints = r.ReadObjectList<TriggerPoint>(triggerPointCount);
             Intersections = r.ReadObjectList<Intersection>(intersectionCount);
@@ -276,6 +275,58 @@ namespace TruckLib.Models.Ppd
                     newdata[j] = r.ReadUInt32();
                 }
                 Unknown.Add(newdata);
+            }
+
+            SetTerrainPoints(terrainPointPositions, terrainPointNormals, terrainPointVariants);
+        }
+
+        /// <summary>
+        /// Parses the terrain point data into a more user-friendly format.
+        /// </summary>
+        /// <param name="terrainPointPositions">The raw, flat list of terrain point positions.</param>
+        /// <param name="terrainPointNormals">The raw, flat list of terrain point normals.</param>
+        /// <param name="terrainPointVariants">The raw, flat list of terrain point variant mappings.</param>
+        private void SetTerrainPoints(List<Vector3> terrainPointPositions, List<Vector3> terrainPointNormals, 
+            List<TerrainPointVariant> terrainPointVariants)
+        {
+            for (int nodeIdx = 0; nodeIdx < Nodes.Count; nodeIdx++)
+            {
+                var node = Nodes[nodeIdx];
+
+                var start = (int)node.TerrainPointIndex;
+                var count = (int)node.TerrainPointCount;
+                var points = terrainPointPositions[start..(start + count)];
+                var normals = terrainPointNormals[start..(start + count)];
+
+                var mappingStart = (int)node.TerrainPointVariantIdx;
+                var mappingsCount = (int)node.TerrainPointVariantCount;
+
+                if (mappingsCount > 0)
+                {
+                    var mappings = terrainPointVariants[mappingStart..(mappingStart + mappingsCount)];
+
+                    for (int mapIdx = 0; mapIdx < mappings.Count; mapIdx++)
+                    {
+                        var list = new List<TerrainPoint>((int)mappings[mapIdx].Length);
+                        node.TerrainPoints[mapIdx] = list;
+
+                        var first = (int)mappings[mapIdx].Start;
+                        var last = mappings[mapIdx].Start + mappings[mapIdx].Length;
+                        for (int pointIdx = first; pointIdx < last; pointIdx++)
+                        {
+                            list.Add(new TerrainPoint(points[pointIdx], normals[pointIdx]));
+                        }
+                    }
+                }
+                else
+                {
+                    var list = new List<TerrainPoint>(count);
+                    node.TerrainPoints[0] = list;
+                    for (int pointIdx = 0; pointIdx < count; pointIdx++)
+                    {
+                        list.Add(new TerrainPoint(points[pointIdx], normals[pointIdx]));
+                    }
+                }
             }
         }
 

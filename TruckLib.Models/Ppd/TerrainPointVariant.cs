@@ -7,22 +7,22 @@ using System.Threading.Tasks;
 
 namespace TruckLib.Models.Ppd
 {
-    public class TerrainPointVariant : IBinarySerializable
+    internal struct TerrainPointVariant : IBinarySerializable
     {
-        public uint Attach0 { get; set; }
+        public uint Start { get; set; }
 
-        public uint Attach1 { get; set; }
+        public uint Length { get; set; }
 
         public void Deserialize(BinaryReader r, uint? version = null)
         {
-            Attach0 = r.ReadUInt32();
-            Attach1 = r.ReadUInt32();
+            Start = r.ReadUInt32();
+            Length = r.ReadUInt32();
         }
 
         public void Serialize(BinaryWriter w)
         {
-            w.Write(Attach0);
-            w.Write(Attach1);
+            w.Write(Start);
+            w.Write(Length);
         }
     }
 }
