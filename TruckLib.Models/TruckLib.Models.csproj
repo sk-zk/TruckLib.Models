@@ -14,13 +14,19 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<Description>Readers for Prism3D model files</Description>
 		<PackageProjectUrl>https://github.com/sk-zk/TruckLib/</PackageProjectUrl>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="TruckLib.Core" Version="0.1.1" />
+	  <PackageReference Include="TruckLib.Core" Version="0.1.2" />
 	</ItemGroup>
-  
-  <ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+	</ItemGroup>
+
+	<ItemGroup>
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
