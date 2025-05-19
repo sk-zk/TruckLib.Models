@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Text;
 
 namespace TruckLib.Models
 {
+    [DebuggerDisplay("{Name.String, nq}")]
     public class Locator : IBinarySerializable
     {
         public Token Name { get; set; }
@@ -17,11 +19,6 @@ namespace TruckLib.Models
         public Quaternion Rotation { get; set; }
 
         public int HookupOffset { get; set; }
-
-        public override string ToString()
-        {
-            return Name.String;
-        }
 
         public void Deserialize(BinaryReader r, uint? version = null)
         {

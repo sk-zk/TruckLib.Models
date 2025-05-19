@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
 using System.Text;
 
 namespace TruckLib.Models
 {
+    [DebuggerDisplay("{Position.X} | {Position.Y} | {Position.Z}")]
     public class Vertex
     {
         public Vector3 Position { get; set; }
@@ -50,11 +52,5 @@ namespace TruckLib.Models
             }
             return cloned;
         }
-
-        public override string ToString()
-        {
-            return $"{Position.X:0.000} | {Position.Y:0.000} | {Position.Z:0.000}";
-        }
-
     }
 }

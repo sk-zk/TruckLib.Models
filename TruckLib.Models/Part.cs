@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace TruckLib.Models
 {
+    [DebuggerDisplay("{Name.String, nq}")]
     public class Part
     {
         public Token Name { get; set; }
@@ -20,11 +22,6 @@ namespace TruckLib.Models
         public Part(Token name)
         {
             Name = name;
-        }
-
-        public override string ToString()
-        {
-            return Name.String;
         }
     }
 }

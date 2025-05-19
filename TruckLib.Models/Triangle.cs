@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
 namespace TruckLib.Models
 {
+    [DebuggerDisplay("({A} {B} {C})")]
     public struct Triangle : IBinarySerializable
     {
         public ushort A { get; set; }
@@ -24,11 +26,6 @@ namespace TruckLib.Models
         public void InvertOrder()
         {
             (C, A) = (A, C);
-        }
-
-        public override string ToString()
-        {
-            return $"({A} {B} {C})";
         }
 
         public void Deserialize(BinaryReader r, uint? version = null)
