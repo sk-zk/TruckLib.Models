@@ -181,7 +181,6 @@ namespace TruckLib.Models.Ppd
             TrafficRule = r.ReadToken();
         }
 
-
         public void Serialize(BinaryWriter w)
         {
             throw new NotImplementedException();
