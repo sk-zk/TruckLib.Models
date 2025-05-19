@@ -27,6 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\ModelTest\admin_04_blkw.pmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\ModelTest\admin_04_blkw.pmg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\PrefabDescriptorTest\blkw_r1_x_r1_narrow_tmpl.ppd.17">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
