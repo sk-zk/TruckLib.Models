@@ -224,10 +224,12 @@ namespace TruckLib.Models
                 case 3:
                     texCoordMask = 0xFFFFF210;
                     break;
+                case 0:
+                    // no idea if this is correct
+                    texCoordMask = 0xFFFFFFFF;
+                    break;
                 default:
-                    throw new NotImplementedException("Turns out that a tex coord width of "
-                    + $"{TextureCoordinateWidth} exists and that I need to reverse engineer this "
-                    + "properly after all.");
+                    throw new NotImplementedException($"Unhandled tex coord width {TextureCoordinateWidth}");
             }
 
             return texCoordMask;
@@ -239,12 +241,17 @@ namespace TruckLib.Models
             {
                 w.Write(vert.Position);
                 w.Write(vert.Normal);
-                if (UseTangents) w.Write(vert.Tangent.Value);
+                if (UseTangents)
+                    w.Write(vert.Tangent.Value);
                 w.Write(vert.Color);
-                if (UseSecondaryColor) w.Write(vert.SecondaryColor.Value);
-                if (UseTextureCoordinates) w.WriteObjectList(vert.TextureCoordinates.Take(TextureCoordinateWidth).ToList());
-                if (UseBoneIndexes) w.Write(vert.BoneIndexes);
-                if (UseBoneWeights) w.Write(vert.BoneWeights);
+                if (UseSecondaryColor)
+                    w.Write(vert.SecondaryColor.Value);
+                if (UseTextureCoordinates)
+                    w.WriteObjectList(vert.TextureCoordinates.Take(TextureCoordinateWidth).ToList());
+                if (UseBoneIndexes)
+                    w.Write(vert.BoneIndexes);
+                if (UseBoneWeights)
+                    w.Write(vert.BoneWeights);
             }
         }
 
