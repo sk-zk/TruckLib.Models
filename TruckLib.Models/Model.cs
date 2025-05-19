@@ -112,13 +112,13 @@ namespace TruckLib.Models
             var pmdPath = Path.Combine(directory, $"{name}.{PmdExtension}");
             using (var w = new BinaryWriter(new FileStream(pmdPath, FileMode.Create)))
             {
-                WritePmd(w);
+                SerializePmd(w);
             }
 
             var pmgPath = Path.ChangeExtension(pmdPath, PmgExtension);
             using (var w = new BinaryWriter(new FileStream(pmgPath, FileMode.Create)))
             {
-                WritePmg(w);
+                SerializePmg(w);
             }
         }
 
@@ -157,14 +157,14 @@ namespace TruckLib.Models
             var materialPathsOffsetsOffset = r.ReadUInt32();
             var materialPathsOffset = r.ReadUInt32();
 
-            // look names
+            // Look names
             Looks.Clear();
             for (int i = 0; i < lookCount; i++)
             {
                 Looks.Add(new Look(r.ReadToken()));
             }
 
-            // variant names
+            // Variant names
             Variants.Clear();
             for (int i = 0; i < variantCount; i++)
             {
@@ -179,8 +179,8 @@ namespace TruckLib.Models
                 var to = r.ReadInt32();
             }
 
-            // attribs header
-            // each variant has the same attribs
+            // Attribs header
+            // Each variant has the same attribs
             for (int i = 0; i < attribsCount; i++)
             {
                 var name = r.ReadToken();
@@ -195,7 +195,7 @@ namespace TruckLib.Models
                 }
             }
 
-            // attribs values
+            // Attribs values
             // TODO: Find out if there are any files where a part has 
             // more than one attrib or if "visible" is actually the only attrib
             // that exists
@@ -207,6 +207,7 @@ namespace TruckLib.Models
                 }
             }
 
+            // Material path offsets
             // I think we can get away with ignoring this?
             var materialPathOffsets = new List<uint>();
             for (int i = 0; i < lookCount * materialCount; i++)
@@ -299,103 +300,83 @@ namespace TruckLib.Models
             }
         }
 
-        private void WritePmd(BinaryWriter w)
+        /// <summary>
+        /// Serializes the pmd part of the model to a <see cref="BinaryWriter"/>.
+        /// </summary>
+        /// <param name="w">The <see cref="BinaryWriter"/> to write to.</param>
+        public void SerializePmd(BinaryWriter w)
         {
-            w.Write(SupportedPmdVersion);
+            w.Write(SupportedPmdVersion);               // 0
 
-            w.Write(Looks[0].Materials.Count);
-            w.Write(Looks.Count);
-            w.Write(Parts.Sum(x => x.Pieces.Count)); // TODO: Why is the pmd piece count different from the pmg piece count?
-            w.Write(Variants.Count);
-            w.Write(Parts.Count);
-            w.Write(Parts.Count); // attribs count
+            w.Write(Looks[0].Materials.Count);          // 4
+            w.Write(Looks.Count);                       // 8
+            // why is this sometimes 0?
+            w.Write(0);                                 // 12
+            w.Write(Variants.Count);                    // 16
+            w.Write(Parts.Count);                       // 20
+            // attribs count
+            w.Write(Parts.Count);                       // 24
 
-            byte[] lookNames = WriteToByteArray((_w) =>
+            // sizes and offsets; to be filled in later
+            w.Write(0); // attribsValuesSize               28
+            w.Write(0); // materialBlockSize               32
+            w.Write(0); // lookOffset                      36
+            w.Write(0); // variantOffset                   40
+            w.Write(0); // partAttribsOffset               44
+            w.Write(0); // attribsValuesOffset             48
+            w.Write(0); // attribsHeaderOffset             52
+            w.Write(0); // materialPathsOffsetsOffset      56
+            w.Write(0); // materialPathsOffset             60
+
+            // Look names
+            var lookOffset = w.BaseStream.Position;
+            foreach (var look in Looks)
             {
-                foreach (var look in Looks)
-                {
-                    _w.Write(look.Name);
-                }
-            });
+                w.Write(look.Name);
+            }
 
-            byte[] variantNames = WriteToByteArray((_w) =>
+            // Variant names
+            var variantOffset = w.BaseStream.Position;
+            foreach (var variant in Variants)
             {
-                foreach (var variant in Variants)
-                {
-                    _w.Write(variant.Name);
-                }
-            });
+                w.Write(variant.Name);
+            }
 
-            // placeholder code
-            byte[] partAttribs = WriteToByteArray((_w) =>
+            // "partAttribs"
+            // TODO: what is this?
+            // v placeholder code
+            var partAttribsOffset = w.BaseStream.Position;
+            for (int i = 0; i < Parts.Count; i++)
             {
-                for (int i = 0; i < Parts.Count; i++)
-                {
-                    _w.Write(i);
-                    _w.Write(i + 1);
-                }
-            });
+                w.Write(i);
+                w.Write(i + 1);
+            }
 
-            byte[] attribsHeader = WriteToByteArray((_w) =>
+            // Attribs header
+            var attribsHeaderOffset = w.BaseStream.Position;
+            var offset = 0;
+            foreach (var attrib in Variants[0].Attributes)
             {
-                var offset = 0;
-                foreach (var attrib in Variants[0].Attributes)
-                {
-                    _w.Write(attrib.Tag);
-                    _w.Write(attrib.Type);
-                    _w.Write(offset);
-                    offset += 4;
-                }
-            });
+                w.Write(attrib.Tag);
+                w.Write(attrib.Type);
+                w.Write(offset);
+                offset += 4;
+            }
 
-            byte[] attribsValues = WriteToByteArray((_w) =>
+            // Attribs values
+            var attribsValuesOffset = w.BaseStream.Position;
+            foreach (var variant in Variants)
             {
-                foreach (var variant in Variants)
+                foreach (var attrib in variant.Attributes)
                 {
-                    foreach (var attrib in variant.Attributes)
-                    {
-                        _w.Write(attrib.Value);
-                    }
+                    w.Write(attrib.Value);
                 }
-            });
+            }
 
-            // materials offsets
-            var materialOffsetsLength = Looks[0].Materials.Count * sizeof(int);
-
+            // Material path offsets
+            var materialPathsOffsetsOffset = w.BaseStream.Position;
             var materialStrs = Looks.Select(x => x.Materials).SelectMany(x => x).ToList();
             var materials = StringUtils.ListToCStringByteList(materialStrs);
-
-            w.Write(attribsValues.Length / Variants.Count);
-            w.Write(materials.Sum(x => x.Length));
-
-            var offsetPartLength = 7 * sizeof(int);
-
-            int lookNamesOffset = (int)w.BaseStream.Position + offsetPartLength;
-            w.Write(lookNamesOffset);
-
-            int variantNamesOffset = lookNamesOffset + lookNames.Length;
-            w.Write(variantNamesOffset);
-
-            int partAttribsOffset = variantNamesOffset + variantNames.Length;
-            w.Write(partAttribsOffset);
-
-            int attribsHeaderOffset = partAttribsOffset + partAttribs.Length;
-            int attribsValuesOffset = attribsHeaderOffset + attribsHeader.Length;
-            w.Write(attribsValuesOffset);
-            w.Write(attribsHeaderOffset);
-
-            int materialOffsetsOffset = attribsValuesOffset + attribsValues.Length;
-            w.Write(materialOffsetsOffset);
-
-            int materialDataOffset = materialOffsetsOffset + materialOffsetsLength;
-            w.Write(materialDataOffset);
-
-            w.Write(lookNames);
-            w.Write(variantNames);
-            w.Write(partAttribs);
-            w.Write(attribsHeader);
-            w.Write(attribsValues);
-
             var materialOffset = (int)w.BaseStream.Position + (materials.Count * sizeof(int));
             for (int i = 0; i < materials.Count; i++)
             {
@@ -403,17 +384,41 @@ namespace TruckLib.Models
                 materialOffset += materials[i].Length;
             }
 
+            // Material paths
+            var materialPathsOffset = w.BaseStream.Position;
             foreach (var str in materials)
             {
                 w.Write(str);
             }
+            var materialBlockSize = w.BaseStream.Position - materialPathsOffset;
+
+            // Jump back to the header and fill in the offsets
+            w.BaseStream.Position = 28;
+            w.Write((int)(materialPathsOffsetsOffset - attribsValuesOffset) / Variants.Count); // attribsValuesSize
+            w.Write((int)materialBlockSize);
+            w.Write((int)lookOffset);
+            w.Write((int)variantOffset);
+            w.Write((int)partAttribsOffset);
+            w.Write((int)attribsValuesOffset);
+            w.Write((int)attribsHeaderOffset);
+            w.Write((int)materialPathsOffsetsOffset);
+            w.Write((int)materialPathsOffset);
         }
 
-        private void WritePmg(BinaryWriter w)
+        /// <summary>
+        /// Serializes the pmg part of the model to a <see cref="BinaryWriter"/>.
+        /// </summary>
+        /// <param name="w">The <see cref="BinaryWriter"/> to write to.</param>
+        public void SerializePmg(BinaryWriter w)
         {
+            // TODO:
+            // * unfuck this the same way I did with pmd
+            // * fix tex coord masks
+            // * fix tris count not matching; tris section probably not matching either
+
             w.Write(SupportedPmgVersion);
 
-            w.Write(Encoding.ASCII.GetBytes(PmgSignature).Reverse().ToArray());
+            w.Write(Encoding.ASCII.GetBytes(PmgSignature));
 
             w.Write(Parts.Sum(x => x.Pieces.Count));
             w.Write(Parts.Count);
