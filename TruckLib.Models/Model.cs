@@ -48,10 +48,10 @@ namespace TruckLib.Models
         /// <returns>A Model object.</returns>
         public static Model Open(string pmdPath)
         {
-            using var pmdStream = new FileStream(pmdPath, FileMode.Open);
+            using var pmdStream = File.OpenRead(pmdPath);
 
             var pmgPath = Path.ChangeExtension(pmdPath, PmgExtension);
-            using var pmgStream = new FileStream(pmgPath, FileMode.Open);
+            using var pmgStream = File.OpenRead(pmgPath);
 
             return Load(pmdStream, pmgStream);
         }

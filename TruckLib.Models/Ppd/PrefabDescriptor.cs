@@ -42,7 +42,7 @@ namespace TruckLib.Models.Ppd
         /// is not supported.</exception>
         public static PrefabDescriptor Open(string path)
         {
-            using var ppdStream = new FileStream(path, FileMode.Open);
+            using var ppdStream = File.OpenRead(path);
             return Load(ppdStream);
         }
 

@@ -63,7 +63,7 @@ namespace TruckLib.Models
         {
             var tobj = new Tobj();
 
-            using var fs = new FileStream(tobjPath, FileMode.Open);
+            using var fs = File.OpenRead(tobjPath);
             using var r = new BinaryReader(fs);
             tobj.Deserialize(r);
 
