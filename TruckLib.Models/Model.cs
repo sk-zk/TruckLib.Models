@@ -414,7 +414,6 @@ namespace TruckLib.Models
             // TODO:
             // * unfuck this the same way I did with pmd
             // * fix tex coord masks
-            // * fix tris count not matching; tris section probably not matching either
 
             w.Write(SupportedPmgVersion);
 
@@ -542,6 +541,7 @@ namespace TruckLib.Models
             {
                 w.Write(vert);
             }
+
             foreach (var tri in piecesTris)
             {
                 w.Write(tri);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -258,12 +257,16 @@ namespace TruckLib.Models
         public void WriteTriangles(BinaryWriter w)
         {
             w.WriteObjectList(Triangles);
+
+            if (Triangles.Count % 2 == 1)
+            {
+                w.Write((short)0);
+            }
         }
 
         public void Serialize(BinaryWriter w)
         {
             throw new NotImplementedException();
         }
-
     }
 }
