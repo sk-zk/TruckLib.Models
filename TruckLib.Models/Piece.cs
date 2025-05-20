@@ -21,6 +21,8 @@ namespace TruckLib.Models
 
         public int TextureCoordinateWidth { get; set; } = 1;
 
+        public uint TextureCoordinateMask { get; set; } = 0xFFFFFFF0;
+
         public uint Material { get; set; }
 
         public bool UseTangents { get; set; } = false;
@@ -41,7 +43,7 @@ namespace TruckLib.Models
         {
             var edges = r.ReadUInt32();
             var verts = r.ReadUInt32();
-            var texCoordMask = r.ReadUInt32(); // what is this even used for?
+            TextureCoordinateMask = r.ReadUInt32(); // what is this even used for?
             TextureCoordinateWidth = r.ReadInt32();
             Material = r.ReadUInt32();
             BoundingBoxCenter = r.ReadVector3();
@@ -117,9 +119,7 @@ namespace TruckLib.Models
             w.Write(Triangles.Count * 3); // Edge count
             w.Write(Vertices.Count);
 
-            uint texCoordMask;
-            texCoordMask = GetTexCoordMask();
-            w.Write(texCoordMask);
+            w.Write(TextureCoordinateMask);
             w.Write(TextureCoordinateWidth);
 
             w.Write(Material);
@@ -207,31 +207,6 @@ namespace TruckLib.Models
             w.Write(vertBoneWeightOffset);
 
             w.Write(trisStart);
-        }
-
-        private uint GetTexCoordMask()
-        {
-            uint texCoordMask;
-            switch (TextureCoordinateWidth)
-            {
-                case 1:
-                    texCoordMask = 0xFFFFFFF0;
-                    break;
-                case 2:
-                    texCoordMask = 0xFFFFFF10;
-                    break;
-                case 3:
-                    texCoordMask = 0xFFFFF210;
-                    break;
-                case 0:
-                    // no idea if this is correct
-                    texCoordMask = 0xFFFFFFFF;
-                    break;
-                default:
-                    throw new NotImplementedException($"Unhandled tex coord width {TextureCoordinateWidth}");
-            }
-
-            return texCoordMask;
         }
 
         public void WriteVertPart(BinaryWriter w)

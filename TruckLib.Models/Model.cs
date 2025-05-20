@@ -411,9 +411,7 @@ namespace TruckLib.Models
         /// <param name="w">The <see cref="BinaryWriter"/> to write to.</param>
         public void SerializePmg(BinaryWriter w)
         {
-            // TODO:
-            // * unfuck this the same way I did with pmd
-            // * fix tex coord masks
+            // TODO: unfuck this the same way I did with pmd
 
             w.Write(SupportedPmgVersion);
 
@@ -537,6 +535,7 @@ namespace TruckLib.Models
             {
                 w.Write(str);
             }
+
             foreach (var vert in piecesVerts)
             {
                 w.Write(vert);
@@ -548,7 +547,7 @@ namespace TruckLib.Models
             }
         }
 
-        private byte[] WriteToByteArray(Action<BinaryWriter> action)
+        private static byte[] WriteToByteArray(Action<BinaryWriter> action)
         {
             byte[] arr;
             using (var ms = new MemoryStream())
@@ -560,7 +559,7 @@ namespace TruckLib.Models
             return arr;
         }
 
-        private long GetLengthOfPieceIndex(List<Piece> pieces)
+        private static long GetLengthOfPieceIndex(List<Piece> pieces)
         {
             long length = 0;
             using (var ms = new MemoryStream())
@@ -576,7 +575,7 @@ namespace TruckLib.Models
             return length;
         }
 
-        private byte[] ListAsByteArray<T>(List<T> list)
+        private static byte[] ListAsByteArray<T>(List<T> list)
         {
             byte[] array;
             using (var ms = new MemoryStream())
