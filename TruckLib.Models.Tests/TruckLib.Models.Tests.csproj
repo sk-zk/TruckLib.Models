@@ -39,7 +39,13 @@
     <None Update="Data\PrefabDescriptorTest\fr_r1_x_r1_t_narrow_tmpl.ppd.18">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\PrefabDescriptorTest\fr_r1_x_r1_t_narrow_tmpl.ppd.19">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\PrefabDescriptorTest\gas_plaza_01_ger.ppd.18">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\PrefabDescriptorTest\gas_plaza_01_ger.ppd.19">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

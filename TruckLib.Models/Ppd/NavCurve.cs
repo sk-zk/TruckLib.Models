@@ -106,14 +106,15 @@ namespace TruckLib.Models.Ppd
                 case 0x16:
                 case 0x17:
                 case 0x18:
-                    Deserialize16to18(r);
+                case 0x19:
+                    Deserialize16to19(r);
                     break;
                 default:
                     throw new NotSupportedException($"Version {version} is not supported.");
             }
         }
 
-        public void Deserialize16to18(BinaryReader r) 
+        public void Deserialize16to19(BinaryReader r) 
         {
             Name = r.ReadToken();
             flags = new FlagField(r.ReadUInt32());

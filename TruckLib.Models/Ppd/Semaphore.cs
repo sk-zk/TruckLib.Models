@@ -37,7 +37,27 @@ namespace TruckLib.Models.Ppd
 
         private uint Unknown1;
 
+        private uint[] Unknown2 = new uint[4];
+
         public void Deserialize(BinaryReader r, uint? version = null)
+        {
+            switch (version)
+            {
+                case 0x15:
+                case 0x16:
+                case 0x17:
+                case 0x18:
+                    Deserialize15to18(r);
+                    break;
+                case 0x19:
+                    Deserialize19(r);
+                    break;
+                default:
+                    throw new NotSupportedException($"Version {version} is not supported.");
+            }
+        }
+
+        public void Deserialize15to18(BinaryReader r)
         {
             Position = r.ReadVector3();
             Rotation = r.ReadQuaternion();
@@ -47,6 +67,22 @@ namespace TruckLib.Models.Ppd
             CycleDelay = r.ReadSingle();
             Profile = r.ReadToken();
             Unknown1 = r.ReadUInt32();
+        }
+
+        public void Deserialize19(BinaryReader r)
+        {
+            Position = r.ReadVector3();
+            Rotation = r.ReadQuaternion();
+            Type = (SemaphoreType)r.ReadUInt32();
+            SemaphoreId = r.ReadUInt32();
+            Intervals = r.ReadVector4();
+            CycleDelay = r.ReadSingle();
+            Profile = r.ReadToken();
+            Unknown1 = r.ReadUInt32();
+            for (int i = 0; i < Unknown2.Length; i++)
+            {
+                Unknown2[i] = r.ReadUInt32();
+            }
         }
 
         public void Serialize(BinaryWriter w)

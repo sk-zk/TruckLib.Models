@@ -19,7 +19,7 @@ namespace TruckLib.Models.Ppd
 
         public SpawnPointType Type { get; set; }
 
-        public uint Unknown { get; set; }
+        public FlagField Flags { get; set; }
 
         public void Deserialize(BinaryReader r, uint? version = null)
         {
@@ -31,7 +31,8 @@ namespace TruckLib.Models.Ppd
                     Deserialize15to17(r);
                     break;
                 case 0x18:
-                    Deserialize18(r);
+                case 0x19:
+                    Deserialize18to19(r);
                     break;
                 default:
                     throw new NotSupportedException($"Version {version} is not supported.");
@@ -45,12 +46,12 @@ namespace TruckLib.Models.Ppd
             Type = (SpawnPointType)r.ReadUInt32();
         }
 
-        private void Deserialize18(BinaryReader r)
+        private void Deserialize18to19(BinaryReader r)
         {
             Position = r.ReadVector3();
             Rotation = r.ReadQuaternion();
             Type = (SpawnPointType)r.ReadUInt32();
-            Unknown = r.ReadUInt32();
+            Flags = new FlagField(r.ReadUInt32());
         }
 
         public void Serialize(BinaryWriter w)
@@ -58,7 +59,7 @@ namespace TruckLib.Models.Ppd
             w.Write(Position);
             w.Write(Rotation);
             w.Write((uint)Type);
-            w.Write(Unknown);
+            w.Write(Flags.Bits);
         }
     }
 }
