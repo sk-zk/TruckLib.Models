@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using TruckLib;
@@ -44,7 +45,7 @@ namespace TruckLib.Models
 
         public TobjColorSpace ColorSpace { get; set; }
 
-        public List<string> TexturePaths { get; set; } = new List<string>(1);
+        public string TexturePath { get; set; }
 
         private uint unknown0;
         private uint unknown1;
@@ -119,13 +120,9 @@ namespace TruckLib.Models
             unknown9 = r.ReadByte();            
             Unknown10 = r.ReadByte();
             ColorSpace = (TobjColorSpace)r.ReadByte();
-            unknown11 = r.ReadByte(); 
+            unknown11 = r.ReadByte();
 
-            var txCount = Type == TobjType.CubeMap ? 6 : 1;
-            for (int i = 0; i < txCount; i++)
-            {
-                TexturePaths.Add(r.ReadPascalString());
-            }
+            TexturePath = r.ReadPascalString();
         }
 
         public void Serialize(BinaryWriter w)
@@ -158,10 +155,7 @@ namespace TruckLib.Models
             w.Write((byte)ColorSpace);
             w.Write(unknown11);
 
-            foreach (var path in TexturePaths)
-            {
-                w.WritePascalString(path);
-            }
+            w.WritePascalString(TexturePath ?? "");
         }
     }
 
