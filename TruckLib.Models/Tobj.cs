@@ -51,13 +51,13 @@ namespace TruckLib.Models
         private uint unknown1;
         private uint unknown2;
         private uint unknown3;
-        public ushort Unknown4 { get; set; }
+        public ushort Unknown4 { get; set; } = 1;
         private byte unknown5;
         private byte unknown6;
         private byte unknown7;
         private byte unknown8;
         private byte unknown9;
-        public byte Unknown10 { get; set; }
+        public byte Unknown10 { get; set; } = 1;
         private byte unknown11;
 
         public static Tobj Open(string tobjPath)
