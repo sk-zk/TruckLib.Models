@@ -40,7 +40,7 @@ namespace TruckLib.Models.Ppd
 
         public Token TrafficRule { get; set; }
 
-        public uint NewData1Id { get; set; }
+        public uint NavNodeIndex { get; set; } = uint.MaxValue;
 
         private FlagField flags = new();
 
@@ -114,41 +114,6 @@ namespace TruckLib.Models.Ppd
             }
         }
 
-        public void Deserialize16to19(BinaryReader r) 
-        {
-            Name = r.ReadToken();
-            flags = new FlagField(r.ReadUInt32());
-
-            LeadsToNodes = (r.ReadByte(), r.ReadByte(), r.ReadByte(), r.ReadByte());
-
-            StartPosition = r.ReadVector3();
-            EndPosition = r.ReadVector3();
-
-            StartRotation = r.ReadQuaternion();
-            EndRotation = r.ReadQuaternion();
-
-            Length = r.ReadSingle();
-
-            for (int i = 0; i < NextLines.Length; i++)
-            {
-                NextLines[i] = r.ReadInt32();
-            }
-
-            for (int i = 0; i < PreviousLines.Length; i++)
-            {
-                PreviousLines[i] = r.ReadInt32();
-            }
-
-            CountNext = r.ReadUInt32();
-            CountPrevious = r.ReadUInt32();
-
-            SemaphoreId = r.ReadInt32();
-
-            TrafficRule = r.ReadToken();
-
-            NewData1Id = r.ReadUInt32();
-        }
-
         public void Deserialize15(BinaryReader r)
         {
             Name = r.ReadToken();
@@ -180,6 +145,41 @@ namespace TruckLib.Models.Ppd
             SemaphoreId = r.ReadInt32();
 
             TrafficRule = r.ReadToken();
+        }
+
+        public void Deserialize16to19(BinaryReader r)
+        {
+            Name = r.ReadToken();
+            flags = new FlagField(r.ReadUInt32());
+
+            LeadsToNodes = (r.ReadByte(), r.ReadByte(), r.ReadByte(), r.ReadByte());
+
+            StartPosition = r.ReadVector3();
+            EndPosition = r.ReadVector3();
+
+            StartRotation = r.ReadQuaternion();
+            EndRotation = r.ReadQuaternion();
+
+            Length = r.ReadSingle();
+
+            for (int i = 0; i < NextLines.Length; i++)
+            {
+                NextLines[i] = r.ReadInt32();
+            }
+
+            for (int i = 0; i < PreviousLines.Length; i++)
+            {
+                PreviousLines[i] = r.ReadInt32();
+            }
+
+            CountNext = r.ReadUInt32();
+            CountPrevious = r.ReadUInt32();
+
+            SemaphoreId = r.ReadInt32();
+
+            TrafficRule = r.ReadToken();
+
+            NavNodeIndex = r.ReadUInt32();
         }
 
         public void Serialize(BinaryWriter w)

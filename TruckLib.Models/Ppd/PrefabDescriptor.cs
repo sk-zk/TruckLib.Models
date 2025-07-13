@@ -31,7 +31,7 @@ namespace TruckLib.Models.Ppd
 
         public List<Intersection> Intersections { get; set; } = [];
 
-        public List<uint[]> Unknown { get; set; } = [];
+        public List<NavNode> NavNodes { get; set; } = [];
 
         /// <summary>
         /// Reads a ppd file from disk.
@@ -162,7 +162,7 @@ namespace TruckLib.Models.Ppd
             var mapPointCount = r.ReadUInt32();
             var triggerPointCount = r.ReadUInt32();
             var intersectionCount = r.ReadUInt32();
-            var newdata1Count = r.ReadUInt32();
+            var navNodeCount = r.ReadUInt32();
 
             // offsets; we can probably ignore this
             for (int i = 0; i < 12; i++)
@@ -178,17 +178,7 @@ namespace TruckLib.Models.Ppd
             var terrainPointVariants = r.ReadObjectList<TerrainPointVariant>(terrainPointVariantCount);
             TriggerPoints = r.ReadObjectList<TriggerPoint>(triggerPointCount);
             Intersections = r.ReadObjectList<Intersection>(intersectionCount);
-
-            // TODO: What is this?
-            for (int i = 0; i < newdata1Count; i++)
-            {
-                var newdata = new uint[24];
-                for (int j = 0; j < newdata.Length; j++)
-                {
-                    newdata[j] = r.ReadUInt32();
-                }
-                Unknown.Add(newdata);
-            }
+            NavNodes = r.ReadObjectList<NavNode>(navNodeCount);
 
             SetTerrainPoints(terrainPointPositions, terrainPointNormals, terrainPointVariants);
         }
@@ -206,7 +196,7 @@ namespace TruckLib.Models.Ppd
             var mapPointCount = r.ReadUInt32();
             var triggerPointCount = r.ReadUInt32();
             var intersectionCount = r.ReadUInt32();
-            var newdata1Count = r.ReadUInt32();
+            var navNodeCount = r.ReadUInt32();
 
             // offsets; we can probably ignore this
             for (int i = 0; i < 12; i++)
@@ -223,17 +213,7 @@ namespace TruckLib.Models.Ppd
             MapPoints = r.ReadObjectList<MapPoint>(mapPointCount);
             TriggerPoints = r.ReadObjectList<TriggerPoint>(triggerPointCount);
             Intersections = r.ReadObjectList<Intersection>(intersectionCount);
-
-            // TODO: What is this?
-            for (int i = 0; i < newdata1Count; i++)
-            {
-                var newdata = new uint[47];
-                for (int j = 0; j < newdata.Length; j++)
-                {
-                    newdata[j] = r.ReadUInt32();
-                }
-                Unknown.Add(newdata);
-            }
+            NavNodes = r.ReadObjectList<NavNode>(navNodeCount);
 
             SetTerrainPoints(terrainPointPositions, terrainPointNormals, terrainPointVariants);
         }
@@ -251,7 +231,7 @@ namespace TruckLib.Models.Ppd
             var mapPointCount = r.ReadUInt32();
             var triggerPointCount = r.ReadUInt32();
             var intersectionCount = r.ReadUInt32();
-            var newdata1Count = r.ReadUInt32();
+            var navNodeCount = r.ReadUInt32();
 
             // offsets; we can probably ignore this
             for (int i = 0; i < 12; i++)
@@ -268,17 +248,7 @@ namespace TruckLib.Models.Ppd
             MapPoints = r.ReadObjectList<MapPoint>(mapPointCount);
             TriggerPoints = r.ReadObjectList<TriggerPoint>(triggerPointCount);
             Intersections = r.ReadObjectList<Intersection>(intersectionCount);
-
-            // TODO: What is this?
-            for (int i = 0; i < newdata1Count; i++)
-            {
-                var newdata = new uint[47];
-                for (int j = 0; j < newdata.Length; j++)
-                {
-                    newdata[j] = r.ReadUInt32();
-                }
-                Unknown.Add(newdata);
-            }
+            NavNodes = r.ReadObjectList<NavNode>(navNodeCount);
 
             SetTerrainPoints(terrainPointPositions, terrainPointNormals, terrainPointVariants);
         }
@@ -296,7 +266,7 @@ namespace TruckLib.Models.Ppd
             var mapPointCount = r.ReadUInt32();
             var triggerPointCount = r.ReadUInt32();
             var intersectionCount = r.ReadUInt32();
-            var newdata1Count = r.ReadUInt32();
+            var navNodeCount = r.ReadUInt32();
 
             // offsets; we can probably ignore this
             for (int i = 0; i < 12; i++)
@@ -313,17 +283,7 @@ namespace TruckLib.Models.Ppd
             MapPoints = r.ReadObjectList<MapPoint>(mapPointCount);
             TriggerPoints = r.ReadObjectList<TriggerPoint>(triggerPointCount);
             Intersections = r.ReadObjectList<Intersection>(intersectionCount);
-
-            // TODO: What is this?
-            for (int i = 0; i < newdata1Count; i++)
-            {
-                var newdata = new uint[47];
-                for (int j = 0; j < newdata.Length; j++)
-                {
-                    newdata[j] = r.ReadUInt32();
-                }
-                Unknown.Add(newdata);
-            }
+            NavNodes = r.ReadObjectList<NavNode>(navNodeCount);
 
             SetTerrainPoints(terrainPointPositions, terrainPointNormals, terrainPointVariants);
         }

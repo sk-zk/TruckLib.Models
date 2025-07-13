@@ -134,4 +134,10 @@ namespace TruckLib.Models.Ppd
         /// </summary>
         Green = 4
     }
+
+    public enum NavNodeType
+    {
+        PhysicalNode = 0,
+        AiNode = 1,
+    }
 }
