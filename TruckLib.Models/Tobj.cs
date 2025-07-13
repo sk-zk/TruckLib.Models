@@ -42,7 +42,7 @@ namespace TruckLib.Models
 
         public bool Anisotropic { get; set; }
 
-        public byte ColorSpace { get; set; }
+        public TobjColorSpace ColorSpace { get; set; }
 
         public List<string> TexturePaths { get; set; } = new List<string>(1);
 
@@ -118,7 +118,7 @@ namespace TruckLib.Models
             Anisotropic = r.ReadByte() != 1;
             unknown9 = r.ReadByte();            
             Unknown10 = r.ReadByte();
-            ColorSpace = r.ReadByte();
+            ColorSpace = (TobjColorSpace)r.ReadByte();
             unknown11 = r.ReadByte(); 
 
             var txCount = Type == TobjType.CubeMap ? 6 : 1;
@@ -155,7 +155,7 @@ namespace TruckLib.Models
             w.Write((!Anisotropic).ToByte());
             w.Write(unknown9);
             w.Write(Unknown10);
-            w.Write(ColorSpace);
+            w.Write((byte)ColorSpace);
             w.Write(unknown11);
 
             foreach (var path in TexturePaths)
@@ -198,5 +198,11 @@ namespace TruckLib.Models
         Mirror = 4, 
         MirrorClamp = 5, 
         MirrorClampToEdge = 6
+    }
+
+    public enum TobjColorSpace
+    {
+        Srgb = 0,
+        Linear = 1,
     }
 }
