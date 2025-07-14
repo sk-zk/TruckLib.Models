@@ -10,7 +10,7 @@ namespace TruckLib.Models
     {
         public Token Name { get; set; }
 
-        public List<string> Materials { get; set; } = new List<string>();
+        public List<string> Materials { get; set; } = [];
 
         public Look()
         {

@@ -48,7 +48,7 @@ namespace TruckLib.Models
             var cloned = (Vertex)MemberwiseClone();
             if (TextureCoordinates != null)
             {
-                cloned.TextureCoordinates = new List<Vector2>(TextureCoordinates);
+                cloned.TextureCoordinates = new(TextureCoordinates);
             }
             return cloned;
         }
