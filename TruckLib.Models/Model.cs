@@ -107,6 +107,11 @@ namespace TruckLib.Models
             return model;
         }
 
+        /// <summary>
+        /// Writes the model to a .pmd and .pmg file.
+        /// </summary>
+        /// <param name="directory">The directory to write the files to.</param>
+        /// <param name="name">The name of the model file, without extension.</param>
         public void Save(string directory, string name)
         {
             var pmdPath = Path.Combine(directory, $"{name}.{PmdExtension}");
