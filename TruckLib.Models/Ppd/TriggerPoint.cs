@@ -39,7 +39,7 @@ namespace TruckLib.Models.Ppd
 
         public float ResetDistance { get; set; }
 
-        public int[] Neighbours { get; private set; } = new int[2];
+        public int[] Neighbors { get; private set; } = new int[2];
 
         private FlagField flags = new();
 
@@ -91,9 +91,9 @@ namespace TruckLib.Models.Ppd
             flags = new FlagField(r.ReadUInt32());
             Position = r.ReadVector3();
 
-            for (int i = 0; i < Neighbours.Length; i++)
+            for (int i = 0; i < Neighbors.Length; i++)
             {
-                Neighbours[i] = r.ReadInt32();
+                Neighbors[i] = r.ReadInt32();
             }
         }
 
@@ -107,9 +107,9 @@ namespace TruckLib.Models.Ppd
             w.Write(flags.Bits);
             w.Write(Position);
 
-            for (int i = 0; i < Neighbours.Length; i++)
+            for (int i = 0; i < Neighbors.Length; i++)
             {
-                w.Write(Neighbours[i]);
+                w.Write(Neighbors[i]);
             }
         }
     }
