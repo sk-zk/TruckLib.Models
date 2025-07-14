@@ -39,7 +39,7 @@ namespace TruckLib.Models.Ppd
 
         public float ResetDistance { get; set; }
 
-        public int[] Neighbours { get; set; } = new int[2];
+        public int[] Neighbours { get; private set; } = new int[2];
 
         private FlagField flags = new();
 
@@ -90,6 +90,7 @@ namespace TruckLib.Models.Ppd
             ResetDistance = r.ReadSingle();
             flags = new FlagField(r.ReadUInt32());
             Position = r.ReadVector3();
+
             for (int i = 0; i < Neighbours.Length; i++)
             {
                 Neighbours[i] = r.ReadInt32();
@@ -98,7 +99,18 @@ namespace TruckLib.Models.Ppd
 
         public void Serialize(BinaryWriter w)
         {
-            throw new NotImplementedException();
+            w.Write(TriggerId);
+            w.Write(Action);
+            w.Write(Range);
+            w.Write(ResetDelay);
+            w.Write(ResetDistance);
+            w.Write(flags.Bits);
+            w.Write(Position);
+
+            for (int i = 0; i < Neighbours.Length; i++)
+            {
+                w.Write(Neighbours[i]);
+            }
         }
     }
 }

@@ -13,6 +13,14 @@ namespace TruckLib.Models.Ppd
 
         public uint Length { get; set; }
 
+        public TerrainPointVariant() { }
+
+        public TerrainPointVariant(uint start, uint length)
+        {
+            Start = start;
+            Length = length;
+        }
+
         public void Deserialize(BinaryReader r, uint? version = null)
         {
             Start = r.ReadUInt32();

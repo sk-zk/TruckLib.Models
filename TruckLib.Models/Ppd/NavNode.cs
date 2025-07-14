@@ -12,9 +12,9 @@ namespace TruckLib.Models.Ppd
 
         public ushort Index { get; set; }
 
-        public List<NavNodeConnectionInfo> Connections { get; set; } = [];
-
         private const byte connectionsCount = 8;
+
+        public LimitedList<NavNodeConnectionInfo> Connections { get; private set; } = new(connectionsCount);
 
         private static readonly NavNodeConnectionInfo empty = new()
         {
@@ -27,20 +27,13 @@ namespace TruckLib.Models.Ppd
             Type = (NavNodeType)r.ReadByte();
             Index = r.ReadUInt16();
 
-            var connectionCount = r.ReadByte();
+            var used = r.ReadByte();
             var connections = r.ReadObjectList<NavNodeConnectionInfo>(connectionsCount);
-            connections = connections[0..connectionCount];
-
-            Connections = connections;
+            Connections = new(connectionsCount, connections[0..used]);
         }
 
         public void Serialize(BinaryWriter w)
         {
-            if (Connections.Count > connectionsCount)
-            {
-                throw new ArgumentOutOfRangeException("Connections.Count");
-            }
-
             w.Write((byte)Type);
             w.Write(Index);
 
@@ -65,29 +58,22 @@ namespace TruckLib.Models.Ppd
 
         public float Length { get; set; }
 
-        public List<ushort> CurveIndices { get; set; } = [];
-
         private const byte curveIndicesCount = 8;
+
+        public LimitedList<ushort> CurveIndices { get; private set; } = new(curveIndicesCount);
 
         public void Deserialize(BinaryReader r, uint? version = null)
         {
             TargetNodeIndex = r.ReadUInt16();
             Length = r.ReadSingle();
 
-            var curveCount = r.ReadByte();
+            var used = r.ReadByte();
             var curveIndices = r.ReadObjectList<ushort>(curveIndicesCount);
-            curveIndices = curveIndices[0..curveCount];
-
-            CurveIndices = curveIndices;
+            CurveIndices = new(curveIndicesCount, curveIndices[0..used]);
         }
 
         public void Serialize(BinaryWriter w)
         {
-            if (CurveIndices.Count > curveIndicesCount)
-            {
-                throw new ArgumentOutOfRangeException("CurveIndices.Count");
-            }
-
             w.Write(TargetNodeIndex);
             w.Write(Length);
 

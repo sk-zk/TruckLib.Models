@@ -79,6 +79,7 @@ namespace TruckLib.Models.Ppd
             CycleDelay = r.ReadSingle();
             Profile = r.ReadToken();
             Unknown1 = r.ReadUInt32();
+
             for (int i = 0; i < Unknown2.Length; i++)
             {
                 Unknown2[i] = r.ReadUInt32();
@@ -87,7 +88,19 @@ namespace TruckLib.Models.Ppd
 
         public void Serialize(BinaryWriter w)
         {
-            throw new NotImplementedException();
+            w.Write(Position);
+            w.Write(Rotation);
+            w.Write((uint)Type);
+            w.Write(SemaphoreId);
+            w.Write(Intervals);
+            w.Write(CycleDelay);
+            w.Write(Profile);
+            w.Write(Unknown1);
+
+            for (int i = 0; i < Unknown2.Length; i++)
+            {
+                w.Write(Unknown2[i]);
+            }
         }
     }
 }

@@ -17,7 +17,9 @@ namespace TruckLib.Models.Ppd
     {
         public Vector3 Position { get; set; }
 
-        public int[] Neighbours { get; set; } = new int[6];
+        private const int neighborsCount = 6;
+
+        public LimitedList<int> Neighbors { get; private set; } = new(neighborsCount);
 
         private FlagField visFlags = new();
 
@@ -116,13 +118,17 @@ namespace TruckLib.Models.Ppd
             navFlags = new FlagField(r.ReadUInt32());
 
             Position = r.ReadVector3();
-            for (int i = 0; i < Neighbours.Length; i++)
-            {
-                Neighbours[i] = r.ReadInt32();
-            }
 
-            // TODO: I think we can ignore this?
-            var neighbourCount = r.ReadUInt32(); 
+            // TODO Sometimes the unsued elements are set to -1,
+            // sometimes they are set to 0.
+            // Is there any significance to this?
+            var neighbors = new int[neighborsCount];
+            for (int i = 0; i < neighborsCount; i++)
+            {
+                neighbors[i] = r.ReadInt32();
+            }
+            var used = r.ReadUInt32();
+            Neighbors = new(neighborsCount, neighbors[0..(int)used]);
         }
 
         public void Serialize(BinaryWriter w)
@@ -131,14 +137,17 @@ namespace TruckLib.Models.Ppd
             w.Write(navFlags.Bits);
             w.Write(Position);
 
-            foreach (var neighbour in Neighbours)
+            // used
+            foreach (var neighbor in Neighbors)
             {
-                w.Write(neighbour);
+                w.Write(neighbor);
             }
-
-            //neighbour_count
-            const int nullValue = -1;
-            w.Write(Neighbours.Count(x => x != nullValue));
+            // unused
+            for (int i = 0; i < neighborsCount - Neighbors.Count; i++)
+            {
+                w.Write(-1);
+            }
+            w.Write(Neighbors.Count);
         }
     }
 }

@@ -34,7 +34,11 @@ namespace TruckLib.Models.Ppd
 
         public void Serialize(BinaryWriter w)
         {
-            throw new NotImplementedException();
+            w.Write(Name);
+            w.Write(Position);
+            w.Write(Rotation);
+            w.Write(Model);
+            w.Write(Part);
         }
     }
 }

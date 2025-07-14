@@ -291,27 +291,27 @@ namespace TruckLib.Models.Ppd
         /// <summary>
         /// Parses the terrain point data into a more user-friendly format.
         /// </summary>
-        /// <param name="terrainPointPositions">The raw, flat list of terrain point positions.</param>
-        /// <param name="terrainPointNormals">The raw, flat list of terrain point normals.</param>
-        /// <param name="terrainPointVariants">The raw, flat list of terrain point variant mappings.</param>
-        private void SetTerrainPoints(List<Vector3> terrainPointPositions, List<Vector3> terrainPointNormals, 
-            List<TerrainPointVariant> terrainPointVariants)
+        /// <param name="positions">The raw, flat list of terrain point positions.</param>
+        /// <param name="normals">The raw, flat list of terrain point normals.</param>
+        /// <param name="variants">The raw, flat list of terrain point variant mappings.</param>
+        private void SetTerrainPoints(List<Vector3> positions, List<Vector3> normals, 
+            List<TerrainPointVariant> variants)
         {
             for (int nodeIdx = 0; nodeIdx < Nodes.Count; nodeIdx++)
             {
                 var node = Nodes[nodeIdx];
 
-                var start = (int)node.TerrainPointIndex;
+                var index = (int)node.TerrainPointIndex;
                 var count = (int)node.TerrainPointCount;
-                var points = terrainPointPositions[start..(start + count)];
-                var normals = terrainPointNormals[start..(start + count)];
+                var nodePositions = positions[index..(index + count)];
+                var nodeNormals = normals[index..(index + count)];
 
-                var mappingStart = (int)node.TerrainPointVariantIdx;
+                var mappingIndex = (int)node.TerrainPointVariantIndex;
                 var mappingsCount = (int)node.TerrainPointVariantCount;
 
                 if (mappingsCount > 0)
                 {
-                    var mappings = terrainPointVariants[mappingStart..(mappingStart + mappingsCount)];
+                    var mappings = variants[mappingIndex..(mappingIndex + mappingsCount)];
 
                     for (int mapIdx = 0; mapIdx < mappings.Count; mapIdx++)
                     {
@@ -322,7 +322,7 @@ namespace TruckLib.Models.Ppd
                         var last = mappings[mapIdx].Start + mappings[mapIdx].Length;
                         for (int pointIdx = first; pointIdx < last; pointIdx++)
                         {
-                            list.Add(new TerrainPoint(points[pointIdx], normals[pointIdx]));
+                            list.Add(new TerrainPoint(nodePositions[pointIdx], nodeNormals[pointIdx]));
                         }
                     }
                 }
@@ -332,15 +332,132 @@ namespace TruckLib.Models.Ppd
                     node.TerrainPoints[0] = list;
                     for (int pointIdx = 0; pointIdx < count; pointIdx++)
                     {
-                        list.Add(new TerrainPoint(points[pointIdx], normals[pointIdx]));
+                        list.Add(new TerrainPoint(nodePositions[pointIdx], nodeNormals[pointIdx]));
                     }
                 }
             }
         }
 
+        private (List<Vector3> Positions, List<Vector3> Normals, List<TerrainPointVariant> Variants) SerializeTerrainPoints()
+        {
+            List<Vector3> positions = [];
+            List<Vector3> normals = [];
+            List<TerrainPointVariant> variants = [];
+
+            for (int nodeIdx = 0; nodeIdx < Nodes.Count; nodeIdx++)
+            {
+                var node = Nodes[nodeIdx];
+
+                int index = positions.Count;
+                int count = 0;
+                int mappingsIndex = variants.Count;
+                int mappingsCount = node.TerrainPoints.Count > 1 ? node.TerrainPoints.Count : 0;
+                int variantStart = 0;
+
+                foreach (var (_, variant) in node.TerrainPoints)
+                {
+                    count += variant.Count;
+                    positions.AddRange(variant.Select(x => x.Position));
+                    normals.AddRange(variant.Select(x => x.Normal));
+                    if (node.TerrainPoints.Count > 1)
+                    {
+                        variants.Add(new((uint)variantStart, (uint)variant.Count));
+                        variantStart += variant.Count;
+                    }
+                }
+
+                node.TerrainPointIndex = (uint)index;
+                node.TerrainPointCount = (uint)count;
+                node.TerrainPointVariantIndex = (uint)mappingsIndex;
+                node.TerrainPointVariantCount = (uint)mappingsCount;
+            }
+
+            return (positions, normals, variants);
+        }
+
         public void Serialize(BinaryWriter w)
         {
-            throw new NotImplementedException();
+            var (terrainPointPositions, terrainPointNormals, terrainPointVariants) = SerializeTerrainPoints();
+
+            w.Write(0x19);                         // 0
+
+            w.Write(Nodes.Count);                  // 4
+            w.Write(NavCurves.Count);              // 8
+            w.Write(Signs.Count);                  // 12
+            w.Write(Semaphores.Count);             // 16
+            w.Write(SpawnPoints.Count);            // 20
+            w.Write(terrainPointPositions.Count);  // 24
+            w.Write(terrainPointVariants.Count);   // 28
+            w.Write(MapPoints.Count);              // 32
+            w.Write(TriggerPoints.Count);          // 36
+            w.Write(Intersections.Count);          // 40
+            w.Write(NavNodes.Count);               // 44
+
+            // Offsets; to be filled in later         48
+            for (int i = 0; i < 12; i++)
+                w.Write(0);
+
+            var nodesOffset = w.BaseStream.Position;
+            w.WriteObjectList(Nodes);
+
+            var navCurvesOffset = w.BaseStream.Position;
+            w.WriteObjectList(NavCurves);
+
+            var signsOffset = w.BaseStream.Position;
+            w.WriteObjectList(Signs);
+
+            var semaphoresOffset = w.BaseStream.Position;
+            w.WriteObjectList(Semaphores);
+
+            var spawnPointsOffset = w.BaseStream.Position;
+            w.WriteObjectList(SpawnPoints);
+
+            var terrainPointPositionsOffset = w.BaseStream.Position;
+            w.WriteObjectList(terrainPointPositions);
+
+            var terrainPointNormalsOffset = w.BaseStream.Position;
+            w.WriteObjectList(terrainPointNormals);
+
+            var terrainPointVariantsOffset = w.BaseStream.Position;
+            w.WriteObjectList(terrainPointVariants);
+
+            var mapPointsOffset = w.BaseStream.Position;
+            w.WriteObjectList(MapPoints);
+
+            var triggerPointsOffset = w.BaseStream.Position;
+            w.WriteObjectList(TriggerPoints);
+
+            var intersectionsOffset = w.BaseStream.Position;
+            w.WriteObjectList(Intersections);
+
+            var navNodesOffset = w.BaseStream.Position;
+            w.WriteObjectList(NavNodes);
+
+            // Jump back to the header and fill in the offsets
+            w.BaseStream.Position = 48;
+            w.Write((int)nodesOffset);
+            w.Write((int)navCurvesOffset);
+            w.Write((int)signsOffset);
+            w.Write((int)semaphoresOffset);
+            w.Write((int)spawnPointsOffset);
+            w.Write((int)terrainPointPositionsOffset);
+            w.Write((int)terrainPointNormalsOffset);
+            w.Write((int)terrainPointVariantsOffset);
+            w.Write((int)mapPointsOffset);
+            w.Write((int)triggerPointsOffset);
+            w.Write((int)intersectionsOffset);
+            w.Write((int)navNodesOffset);
+        }
+
+        /// <summary>
+        /// Writes the prefab descriptor to a file.
+        /// </summary>
+        /// <param name="path">The path of the file.</param>
+        public void Save(string path)
+        {
+            using var fs = File.Create(path);
+            using var w = new BinaryWriter(fs);
+            Serialize(w);
         }
     }
 }

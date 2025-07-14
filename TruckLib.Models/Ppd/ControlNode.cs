@@ -22,9 +22,9 @@ namespace TruckLib.Models.Ppd
         public int[] OutputLines { get; set; } = new int[8];
 
         /// <summary>
-        /// The terrain points for this node, which are used to extrude
-        /// terrain from the edge of this node.
-        /// The key of the dictionary is the index of the model variant.
+        /// <para>The terrain points for this node, which are used to extrude
+        /// terrain from the edge of this node.</para>
+        /// <para>The key of the dictionary is the index of the model variant.</para>
         /// </summary>
         public Dictionary<int, List<TerrainPoint>> TerrainPoints { get; set; } = [];
 
@@ -32,7 +32,7 @@ namespace TruckLib.Models.Ppd
 
         internal uint TerrainPointCount { get; set; }
 
-        internal uint TerrainPointVariantIdx { get; set; }
+        internal uint TerrainPointVariantIndex { get; set; }
 
         internal uint TerrainPointVariantCount { get; set; }
 
@@ -40,7 +40,7 @@ namespace TruckLib.Models.Ppd
         {
             TerrainPointIndex = r.ReadUInt32();
             TerrainPointCount = r.ReadUInt32();
-            TerrainPointVariantIdx = r.ReadUInt32();
+            TerrainPointVariantIndex = r.ReadUInt32();
             TerrainPointVariantCount = r.ReadUInt32();
 
             Position = r.ReadVector3();
@@ -59,7 +59,23 @@ namespace TruckLib.Models.Ppd
 
         public void Serialize(BinaryWriter w)
         {
-            throw new NotImplementedException();
+            w.Write(TerrainPointIndex);
+            w.Write(TerrainPointCount);
+            w.Write(TerrainPointVariantIndex);
+            w.Write(TerrainPointVariantCount);
+
+            w.Write(Position);
+            w.Write(Direction);
+
+            for (int i = 0; i < InputLines.Length; i++)
+            {
+                w.Write(InputLines[i]);
+            }
+
+            for (int i = 0; i < OutputLines.Length; i++)
+            {
+                w.Write(OutputLines[i]);
+            }
         }
     }
 }

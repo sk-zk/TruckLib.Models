@@ -28,13 +28,11 @@ namespace TruckLib.Models.Ppd
 
         public float Length { get; set; }
 
-        public int[] NextLines { get; set; } = new int[4];
+        private const int linesCount = 4;
 
-        public int[] PreviousLines { get; set; } = new int[4];
+        public LimitedList<int> NextLines { get; private set; } = new(linesCount);
 
-        public uint CountNext { get; set; }
-
-        public uint CountPrevious { get; set; }
+        public LimitedList<int> PreviousLines { get; private set; } = new(linesCount);
 
         public int SemaphoreId { get; set; }
 
@@ -129,18 +127,23 @@ namespace TruckLib.Models.Ppd
 
             Length = r.ReadSingle();
 
-            for (int i = 0; i < NextLines.Length; i++)
+            var nextLines = new int[linesCount];
+            for (int i = 0; i < linesCount; i++)
             {
-                NextLines[i] = r.ReadInt32();
+                nextLines[i] = r.ReadInt32();
             }
 
-            for (int i = 0; i < PreviousLines.Length; i++)
+            var previousLines = new int[linesCount];
+            for (int i = 0; i < linesCount; i++)
             {
-                PreviousLines[i] = r.ReadInt32();
+                previousLines[i] = r.ReadInt32();
             }
 
-            CountNext = r.ReadUInt32();
-            CountPrevious = r.ReadUInt32();
+            var nextUsed = r.ReadUInt32();
+            var previousUsed = r.ReadUInt32();
+
+            NextLines = new(linesCount, nextLines[0..(int)nextUsed]);
+            PreviousLines = new(linesCount, previousLines[0..(int)previousUsed]);
 
             SemaphoreId = r.ReadInt32();
 
@@ -162,18 +165,23 @@ namespace TruckLib.Models.Ppd
 
             Length = r.ReadSingle();
 
-            for (int i = 0; i < NextLines.Length; i++)
+            var nextLines = new int[linesCount];
+            for (int i = 0; i < linesCount; i++)
             {
-                NextLines[i] = r.ReadInt32();
+                nextLines[i] = r.ReadInt32();
             }
 
-            for (int i = 0; i < PreviousLines.Length; i++)
+            var previousLines = new int[linesCount];
+            for (int i = 0; i < linesCount; i++)
             {
-                PreviousLines[i] = r.ReadInt32();
+                previousLines[i] = r.ReadInt32();
             }
 
-            CountNext = r.ReadUInt32();
-            CountPrevious = r.ReadUInt32();
+            var nextUsed = r.ReadUInt32();
+            var previousUsed = r.ReadUInt32();
+
+            NextLines = new(linesCount, nextLines[0..(int)nextUsed]);
+            PreviousLines = new(linesCount, previousLines[0..(int)previousUsed]);
 
             SemaphoreId = r.ReadInt32();
 
@@ -184,7 +192,52 @@ namespace TruckLib.Models.Ppd
 
         public void Serialize(BinaryWriter w)
         {
-            throw new NotImplementedException();
+            w.Write(Name);
+            w.Write(flags.Bits);
+
+            w.Write(LeadsToNodes.EndNode);
+            w.Write(LeadsToNodes.EndLane);
+            w.Write(LeadsToNodes.StartNode);
+            w.Write(LeadsToNodes.StartLane);
+
+            w.Write(StartPosition);
+            w.Write(EndPosition);
+
+            w.Write(StartRotation);
+            w.Write(EndRotation);
+
+            w.Write(Length);
+
+            // used
+            foreach (var idx in NextLines)
+            {
+                w.Write(idx);
+            }
+            // unused
+            for (int i = 0; i < linesCount - NextLines.Count; i++)
+            {
+                w.Write(-1);
+            }
+
+            // used
+            foreach (var idx in PreviousLines)
+            {
+                w.Write(idx);
+            }
+            // unused
+            for (int i = 0; i < linesCount - PreviousLines.Count; i++)
+            {
+                w.Write(-1);
+            }
+
+            w.Write(NextLines.Count);
+            w.Write(PreviousLines.Count);
+
+            w.Write(SemaphoreId);
+
+            w.Write(TrafficRule);
+
+            w.Write(NavNodeIndex);
         }
     }
 }
