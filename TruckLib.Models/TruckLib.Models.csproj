@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<RootNamespace>TruckLib.Models</RootNamespace>
 		<Authors>skzk</Authors>
-		<Version>0.3.1.0</Version>
+		<Version>0.4.0.0</Version>
 		<Title>TruckLib.Models</Title>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/sk-zk/TruckLib.Models</RepositoryUrl>
@@ -19,7 +19,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="TruckLib.Core" Version="0.2.1" />
+	  <PackageReference Include="TruckLib.Core" Version="0.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>
