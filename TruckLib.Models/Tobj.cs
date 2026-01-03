@@ -73,12 +73,15 @@ namespace TruckLib.Models
 
         public static Tobj Load(byte[] tobjBytes)
         {
-            var tobj = new Tobj();
-
             using var ms = new MemoryStream(tobjBytes);
-            using var r = new BinaryReader(ms);
-            tobj.Deserialize(r);
+            return Load(ms);
+        }
 
+        public static Tobj Load(Stream stream)
+        {
+            var tobj = new Tobj();
+            using var r = new BinaryReader(stream);
+            tobj.Deserialize(r);
             return tobj;
         }
 
@@ -89,6 +92,7 @@ namespace TruckLib.Models
             Serialize(w);
         }
 
+        /// <inheritdoc/>
         public void Deserialize(BinaryReader r, uint? version = null)
         {
             if (version is not null && version != SupportedVersion)
@@ -125,6 +129,7 @@ namespace TruckLib.Models
             TexturePath = r.ReadPascalString();
         }
 
+        /// <inheritdoc/>
         public void Serialize(BinaryWriter w)
         {
             w.Write(SupportedVersion);
