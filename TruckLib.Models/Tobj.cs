@@ -77,10 +77,10 @@ namespace TruckLib.Models
             return Load(ms);
         }
 
-        public static Tobj Load(Stream stream)
+        public static Tobj Load(Stream stream, bool keepOpen = false)
         {
             var tobj = new Tobj();
-            using var r = new BinaryReader(stream);
+            using var r = new BinaryReader(stream, Encoding.UTF8, keepOpen);
             tobj.Deserialize(r);
             return tobj;
         }
