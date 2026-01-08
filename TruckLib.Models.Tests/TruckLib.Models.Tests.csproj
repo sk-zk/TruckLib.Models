@@ -48,6 +48,9 @@
     <None Update="Data\PrefabDescriptorTest\gas_plaza_01_ger.ppd.19">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\TobjTest\cubetx.tobj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
