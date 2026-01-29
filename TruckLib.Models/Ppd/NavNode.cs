@@ -48,7 +48,6 @@ namespace TruckLib.Models.Ppd
             {
                 empty.Serialize(w);
             }
-
         }
     }
 
