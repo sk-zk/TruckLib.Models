@@ -303,8 +303,6 @@ namespace TruckLib.Models.Ppd
 
                 var index = (int)node.TerrainPointIndex;
                 var count = (int)node.TerrainPointCount;
-                var nodePositions = positions[index..(index + count)];
-                var nodeNormals = normals[index..(index + count)];
 
                 var mappingIndex = (int)node.TerrainPointVariantIndex;
                 var mappingsCount = (int)node.TerrainPointVariantCount;
@@ -320,14 +318,17 @@ namespace TruckLib.Models.Ppd
 
                         var first = (int)mappings[mapIdx].Start;
                         var last = mappings[mapIdx].Start + mappings[mapIdx].Length;
+
                         for (int pointIdx = first; pointIdx < last; pointIdx++)
                         {
-                            list.Add(new TerrainPoint(nodePositions[pointIdx], nodeNormals[pointIdx]));
+                            list.Add(new TerrainPoint(positions[index+pointIdx], normals[index+pointIdx]));
                         }
                     }
                 }
                 else
                 {
+                    var nodePositions = positions[index..(index + count)];
+                    var nodeNormals = normals[index..(index + count)];
                     var list = new List<TerrainPoint>(count);
                     node.TerrainPoints[0] = list;
                     for (int pointIdx = 0; pointIdx < count; pointIdx++)
